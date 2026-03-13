@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class SPN(nn.Module):
+class DPN(nn.Module):
     def __init__(self, input_features, total_nodes, output_nodes, minimal=True, hidden_dims=None):
         super().__init__()
         self.minimal = minimal

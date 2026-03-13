@@ -4,7 +4,7 @@ import time
 cp.random.seed(42)
 
 
-class SPN:
+class DPN:
     def __init__ (self, input_features, total_nodes, output_nodes):
         self.weights = None
         self.output_size = output_nodes
@@ -14,7 +14,7 @@ class SPN:
 
     def compile(self):
         if self.weights is None:
-            self.weights = SPN.get_weights(self.num_nodes, self.input_size)
+            self.weights = DPN.get_weights(self.num_nodes, self.input_size)
         
         self.blocks = self.get_blocks()
         self.m = cp.zeros_like(self.weights)
@@ -182,17 +182,17 @@ class SPN:
 
         total_inputs = cp.vstack([X, outputs[:self.blocks[-1], :]])
 
-        final_output = SPN.softmax(outputs[-self.output_size:, :])
+        final_output = DPN.softmax(outputs[-self.output_size:, :])
 
         self.back_prop(total_inputs, final_output, Y, alpha, beta_1, beta_2, epsilon, t)
 
         end = time.time()
 
         #calculate loss
-        loss = SPN.categorical_crossentropy(final_output, Y)
+        loss = DPN.categorical_crossentropy(final_output, Y)
 
         #calculate accuracy
-        accuracy = SPN.caclulate_accuracy(final_output, Y)
+        accuracy = DPN.caclulate_accuracy(final_output, Y)
 
         return cp.hstack((end - start, cp.mean(loss), cp.mean(accuracy)))
     
@@ -211,7 +211,7 @@ class SPN:
         for i in range(epochs):
         
             metrics = []
-            for batch_num, (batch_X, batch_Y) in enumerate(SPN.get_batches(X_train, Y_train, batch_size, X_train.shape[1])):
+            for batch_num, (batch_X, batch_Y) in enumerate(DPN.get_batches(X_train, Y_train, batch_size, X_train.shape[1])):
                 metrics.append(self.run_epoch(batch_X, batch_Y, alpha, beta_1, beta_2, epsilon, t))
                 t += 1
 
@@ -219,9 +219,9 @@ class SPN:
             
             #validate output
             outputs = self.forward_prop(X_val)
-            final_output = SPN.softmax(outputs[-10:, :])
-            val_loss = cp.mean(SPN.categorical_crossentropy(final_output, Y_val))
-            val_accuracy = cp.mean(SPN.caclulate_accuracy(final_output, Y_val))
+            final_output = DPN.softmax(outputs[-10:, :])
+            val_loss = cp.mean(DPN.categorical_crossentropy(final_output, Y_val))
+            val_accuracy = cp.mean(DPN.caclulate_accuracy(final_output, Y_val))
 
             print(f"Epoch: {i + 1} Total_Time: {cp.sum(metrics[:, 0]):.4f} Average_Time_per_batch: {cp.mean(metrics[:, 0]):.4f} Train_Accuracy: {metrics[-1, 2]:.4f} Train_Loss: {metrics[-1, 1]:.4f} Val_Accuracy: {val_accuracy:.4f} Val_Loss: {val_loss:.4f}")
             train_metrics.append(metrics)
@@ -235,9 +235,9 @@ class SPN:
             X_test = X_test[~self.input_features_to_remove, :]
 
         outputs = self.forward_prop(X_test)
-        final_output = SPN.softmax(outputs[-self.output_size:, :])
-        test_loss = cp.mean(SPN.categorical_crossentropy(final_output, Y_test))
-        test_accuracy = cp.mean(SPN.caclulate_accuracy(final_output, Y_test))
+        final_output = DPN.softmax(outputs[-self.output_size:, :])
+        test_loss = cp.mean(DPN.categorical_crossentropy(final_output, Y_test))
+        test_accuracy = cp.mean(DPN.caclulate_accuracy(final_output, Y_test))
 
         print("Test_Accuracy: ", test_accuracy, "Test_Loss: ", test_loss)
         return [test_loss, test_accuracy]
@@ -267,7 +267,7 @@ class SPN:
             else:
                 p = percent / 2
 
-            masks[blocks[i]: blocks[i + 1], : self.input_size + blocks[i]] = SPN.prune_by_percent_once(p, mask, W)
+            masks[blocks[i]: blocks[i + 1], : self.input_size + blocks[i]] = DPN.prune_by_percent_once(p, mask, W)
 
         return masks
         

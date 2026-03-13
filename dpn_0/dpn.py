@@ -135,7 +135,7 @@ class Neuron:
             for i in range(len(self.parents) - 1, -1, -1):
                 self.parents[i].back_prop(d_output[-(len(self.parents) - i), :].reshape(1, num_samples), t)
 
-class SPN:
+class DPN:
 
     def __init__ (self):
         self.input_nodes = []
@@ -258,7 +258,7 @@ class SPN:
         for j in range(1, 10):
             output = cp.vstack([output, self.vertices[self.output_nodes[j]].output])
 
-        output = SPN.softmax(output)
+        output = DPN.softmax(output)
         gradient = output - Y
 
         #back prop
@@ -268,11 +268,11 @@ class SPN:
         end = time.time()
         
         #calculate loss
-        loss = SPN.categorical_crossentropy(output, Y)
+        loss = DPN.categorical_crossentropy(output, Y)
         #print("Loss: ", cp.mean(loss))
 
         #calculate accuracy
-        accuracy = SPN.caclulate_accuracy(output, Y)
+        accuracy = DPN.caclulate_accuracy(output, Y)
         #print("Accuracy: ", cp.mean(accuracy))
 
         return cp.hstack((end - start, cp.mean(loss), cp.mean(accuracy)))
@@ -286,7 +286,7 @@ class SPN:
         for i in range(epochs):
 
             metrics = []
-            for batch_num, (batch_X, batch_Y) in enumerate(SPN.get_batches(x_train, y_train, batch_size)):
+            for batch_num, (batch_X, batch_Y) in enumerate(DPN.get_batches(x_train, y_train, batch_size)):
                 metrics.append(self.train(batch_X, batch_Y, t))
                 t += 1
 
@@ -300,8 +300,8 @@ class SPN:
 
             for j in range(1, 10):
                 output = cp.vstack([output, self.vertices[self.output_nodes[j]].output])
-            val_loss = cp.mean(SPN.categorical_crossentropy(output, y_val))
-            val_accuracy = cp.mean(SPN.caclulate_accuracy(output, y_val))
+            val_loss = cp.mean(DPN.categorical_crossentropy(output, y_val))
+            val_accuracy = cp.mean(DPN.caclulate_accuracy(output, y_val))
 
             print(f"Epoch: {i + 1} Total_Time: {cp.sum(metrics[:, 0]):.4f} Average_Time_per_batch: {cp.mean(metrics[:, 0]):.4f} Train_Accuracy: {metrics[-1, 2]:.4f} Train_Loss: {metrics[-1, 1]:.4f} Val_Accuracy: {val_accuracy:.4f} Val_Loss: {val_loss:.4f}")
             train_metrics.append(metrics)
@@ -315,8 +315,8 @@ class SPN:
             output = cp.vstack([output, self.vertices[self.output_nodes[j]].output])
 
         #print(output.shape, x_test_flat.shape)
-        test_loss = cp.mean(SPN.categorical_crossentropy(output, y_test))
-        test_accuracy = cp.mean(SPN.caclulate_accuracy(output, y_test))
+        test_loss = cp.mean(DPN.categorical_crossentropy(output, y_test))
+        test_accuracy = cp.mean(DPN.caclulate_accuracy(output, y_test))
 
         print("Test_Accuracy: ", test_accuracy, "Test_Loss: ", test_loss)
 

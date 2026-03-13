@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.autograd as autograd
 
-class SPNAutoGrad(autograd.Function):
+class DPNAutoGrad(autograd.Function):
     @staticmethod
     def forward(ctx, input, output_size, biases, *weights):
 
@@ -74,9 +74,9 @@ class SPNAutoGrad(autograd.Function):
               
         return d_input, None, d_biases, *d_weights
 
-class SPN(nn.Module):
+class DPN(nn.Module):
     def __init__ (self, input_features, total_nodes, output_nodes, use_min_weights = True, device=None):
-        super(SPN, self).__init__()
+        super(DPN, self).__init__()
         self.weights = nn.ParameterList()
         self.output_nodes = output_nodes
         self.input_features = input_features
@@ -86,7 +86,7 @@ class SPN(nn.Module):
 
     def compile(self):
         if len(self.weights) == 0:
-            weight_list, biases = SPN.get_weights(self.total_nodes, self.input_features, self.output_nodes, self.use_min_weights, self.device)
+            weight_list, biases = DPN.get_weights(self.total_nodes, self.input_features, self.output_nodes, self.use_min_weights, self.device)
             self.weights.extend(weight_list)
             self.biases = biases
 
@@ -140,4 +140,4 @@ class SPN(nn.Module):
     
     def forward(self, x):
 
-        return SPNAutoGrad.apply(x, self.output_nodes, self.biases, *list(self.weights))
+        return DPNAutoGrad.apply(x, self.output_nodes, self.biases, *list(self.weights))
